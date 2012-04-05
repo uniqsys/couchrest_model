@@ -64,5 +64,3 @@ require "couchrest/model/base"
 if defined?(Rails)
   require "couchrest/railtie"
 end
-
-require "pry"
