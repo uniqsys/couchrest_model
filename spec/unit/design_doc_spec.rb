@@ -167,21 +167,24 @@ describe CouchRest::Model::DesignDoc do
         class_name = "#{example.metadata[:full_description].gsub(/\s+/,'_').camelize}Model"
         doc = CouchRest::Document.new("_id" => "_design/#{class_name}")
         doc["language"] = "javascript"
-        doc["views"] = {"all" => {"map" => 
-                                  "function(doc) {
-                                 if (doc['type'] == 'Article') {
-                                   emit(doc['_id'],1);
-                                 }
-                               }"},
-                         "by_name" => {"map" => 
-                                       "function(doc) {
-                                     if ((doc['type'] == '#{class_name}') && (doc['name'] != null)) {
-                                       emit(doc['name'], null);
-                                     }",
-                                      "reduce" => 
-                                      "function(keys, values, rereduce) {
-                                        return sum(values);
-                                      }"}}
+        doc["views"] = {
+          "all" => {"map" =>
+            "function(doc) {
+              if (doc['type'] == 'Article') {
+                emit(doc['_id'],1);
+              }
+            }"},
+            "by_name" => {"map" =>
+              "function(doc) {
+                if ((doc['type'] == 'special') && (doc['name'] != null)) {
+                  emit(doc['name'], null);
+                }}",
+              "reduce" =>
+                "function(keys, values, rereduce) {
+                  return sum(values);
+                }"
+            }
+        }
         
         DB.save_doc doc
 
@@ -228,7 +231,7 @@ describe CouchRest::Model::DesignDoc do
       end
 
       it "is able to use predefined views" do 
-        model_class.by_name(key: "special").all
+        model_class.by_name(:key => "special").all
       end
     end
   end
